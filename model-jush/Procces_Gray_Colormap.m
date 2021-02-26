@@ -4,13 +4,18 @@ for i = 0:29
     Y = (imread(sprintf(('%d_truth.png'),i)));
     imwrite(ind2rgb(im2uint8(Y), parula(256)), (sprintf(('%d_truth_color.png'),i)));
     
-    MSE_Keras(i+1) = (sumsqr(X./255.0 - Y./255.0))./(256*256);
+    MSE_Keras(i+1) = (sumsqr(double(Y)./255.0 - double(X)./255.0))./(256*256);
     
     Xsos = double(X)*(300.0/255) + 500.0;
     Ysos = double(Y)*(300.0/255) + 500.0;
     
     Error_Map_SoS = Ysos-Xsos;
-    MSE_SoS(i+1) = (sumsqr(Error_Map_SoS))./(256*256);
+    imagesc(Error_Map_SoS, [-256 256]), colorbar, cmocean('balance', 'pivot', 0), ax=gca; set(ax, 'xtick',[],'ytick',[]); axis square; H = getframe(gca);  
+    %saveas(gcf,sprintf('%d_error.png',i));
+    imwrite(H.cdata, sprintf('%d_error.png',i));
+    %exportgraphics(ax, sprintf('%d_error.png',i));
     
+    MSE_SoS(i+1) = (sumsqr(Error_Map_SoS))./(256*256); %Mean Square Error in m/S
+    MAE_SoS(i+1) = sum(abs(Error_Map_SoS), 'all')./(256*256);
     
 end
